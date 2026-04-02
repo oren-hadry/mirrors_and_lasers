@@ -1,3 +1,16 @@
+## How to run this project:
+
+# from stdin
+echo "5 6 1 4\n2 3\n1 2\n2 5\n4 2\n5 5" | cargo run
+
+# from a file
+cargo run -- input.txt
+
+# tests
+cargo test
+
+
+## Problem description
 
 Note: Used AI assistance for Rust syntax, all design decisions and logic are mine.
 
@@ -18,7 +31,7 @@ k, r, c - if the safe does not open without inserting a mirror, there are
 -1 - impossible if the safe cannot be opened with or without inserting a
 mirror.
 
-solution:
+## solution:
   option A: brute force - run spanning tree on greed - check all possible positions for mirror
   option B: 
   check for solution:  run from start to end and see if we have reach end point, regarding loops (not possible as mirror not transparent), find next mirror in O(log(n)) sort the mirrors by row, col.
@@ -27,7 +40,7 @@ solution:
   we have found a solution. otherwise, we have no solution.
 
 
-# Design Decisions
+## Design Decisions
 
 I went with option B. The grid can be up to 1,000,000 x 1,000,000 — we can never allocate it.
 Instead, mirrors are stored in two sorted maps: one indexed by row, one by column.
@@ -42,7 +55,7 @@ deflects one path onto the other, completing the circuit.
 To find all such crossings efficiently I use a sweep line over columns, which avoids the
 O(H*V) brute-force comparison of every segment pair.
 
-# Complexity
+## Complexity
 
 Let M = total number of mirrors (m + n), S = number of segments each trace produces (at most M+1).
 
