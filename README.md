@@ -3,9 +3,6 @@
 # from stdin
 echo "5 6 1 4\n2 3\n1 2\n2 5\n4 2\n5 5" | cargo run
 
-# from a file
-cargo run -- input.txt
-
 # tests
 cargo test
 
@@ -20,7 +17,7 @@ input is :
     [m] lines of left mirror positions [x, y]
     [n] lines of right mirror positions [x, y]
 
-input from file or stdin as default
+input from stdin
 
 output: 
 0  - safe is open without inserting a mirror

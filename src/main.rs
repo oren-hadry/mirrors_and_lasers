@@ -1,8 +1,6 @@
 
 // Note: Used AI assistance for Rust syntax, all design decisions and logic are mine.
 
-use std::env;
-use std::fs;
 use std::io::Read;
 
 mod solver;
@@ -44,17 +42,8 @@ fn parse_input(input: &str) -> PuzzleInput {
 }
 
 fn main() {
-    // read input from file or stdin
-    let args: Vec<String> = env::args().collect();
-
-    let input = if let Some(path) = args.get(1) {
-        fs::read_to_string(path).expect("Failed to read file")
-    } else {
-        // read from stdin
-        let mut buf = String::new();
-        std::io::stdin().read_to_string(&mut buf).unwrap();
-        buf
-    };
+    let mut input = String::new();
+    std::io::stdin().read_to_string(&mut input).unwrap();
 
     let puzzle = parse_input(&input);
     println!("{}", solve(&puzzle));
