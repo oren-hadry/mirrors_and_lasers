@@ -1,1 +1,0 @@
-/Users/oren/Documents/personal/work_preparations/NOEON/mirrors_and_Lasers/target/debug/hello_world: /Users/oren/Documents/personal/work_preparations/NOEON/mirrors_and_Lasers/src/main.rs /Users/oren/Documents/personal/work_preparations/NOEON/mirrors_and_Lasers/src/solver.rs
