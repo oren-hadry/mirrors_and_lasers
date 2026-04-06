@@ -164,7 +164,8 @@ fn trace(
 // This enforces strict interior: a segment with boundary at C is NOT active
 // during a query at C.
 //
-// O((H + V) log(H + V) + K) where K = number of intersections found.
+// O((H + V) log(H + V) + K log K) where K = number of intersections found.
+// The K log K term comes from inserting each result into the output BTreeSet.
 fn intersect_h_v(
     h_segs: &[&Segment],
     v_segs: &[&Segment],

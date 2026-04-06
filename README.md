@@ -1,64 +1,48 @@
-## How to run this project:
+# Mirrors and Lasers
 
+> Note: Used AI assistance for Rust syntax; all design decisions and logic are my own.
+
+## Running
+
+```bash
 # from stdin
 echo "5 6 1 4\n2 3\n1 2\n2 5\n4 2\n5 5" | cargo run
 
 # tests
 cargo test
+```
 
+## Problem
 
-## Problem description
+A laser enters a grid at the top-left and must exit at the bottom-right, deflected by `/` and `\` mirrors. Given an existing mirror layout, find how many empty cells, if any, could receive a new mirror to open the safe.
 
-Note: Used AI assistance for Rust syntax, all design decisions and logic are mine.
+**Input** (stdin):
+- Line 1: `r c m n` — grid dimensions, count of `/` mirrors, count of `\` mirrors
+- Next `m` lines: `row col` positions of `/` mirrors
+- Next `n` lines: `row col` positions of `\` mirrors
 
-problem space: grid of size [r, c] where each cell can have 3 states [empty, left_mirror, right_mirror]
-input is :
-    [r, c, m, and n] r is the number of rows, c is the number of columns
-    [m] lines of left mirror positions [x, y]
-    [n] lines of right mirror positions [x, y]
+**Output**:
+- `0` — beam already reaches the exit without any insertion
+- `k r c` — `k` valid insertion positions exist; `(r, c)` is the lexicographically smallest
+- `impossible` — no single mirror insertion can open the safe
 
-input from stdin
+## Approach
 
-output: 
-0  - safe is open without inserting a mirror
-k, r, c - if the safe does not open without inserting a mirror, there are
-          exactly k positions where inserting a mirror opens the safe, and (r, c)
-          is the lexicographically smallest such row, column position. A position
-          where both a / and a \mirror open the safe counts just once.
--1 - impossible if the safe cannot be opened with or without inserting a
-mirror.
+The grid can be up to 1,000,000 × 1,000,000, so allocating it is not viable. Mirrors are stored in two sorted maps (by row, by column), allowing O(log M) jumps to the next mirror in any direction.
 
-## solution:
-  option A: brute force - run spanning tree on greed - check all possible positions for mirror
-  option B: 
-  check for solution:  run from start to end and see if we have reach end point, regarding loops (not possible as mirror not transparent), find next mirror in O(log(n)) sort the mirrors by row, col.
-  check inserting mirror: run on grid from both ends, each cell we will indicate entry and exit points
-  if we have found a cell that have different (90 degrees)entry and exit points, 
-  we have found a solution. otherwise, we have no solution.
+**Beam tracing**: trace forward from the laser entry and backward from the detector. Each trace produces a list of horizontal and vertical segments.
 
-
-## Design Decisions
-
-I went with option B. The grid can be up to 1,000,000 x 1,000,000 — we can never allocate it.
-Instead, mirrors are stored in two sorted maps: one indexed by row, one by column.
-This lets us jump to the next mirror in any direction in O(log n), skipping all empty cells.
-
-The core idea: trace the beam forward from the laser entry, and backward from the detector.
-Each trace produces a set of horizontal and vertical segments.
-A mirror insertion works when a forward-horizontal segment crosses a backward-vertical segment
-(or forward-vertical crosses backward-horizontal) at an empty cell — the mirror at that cell
-deflects one path onto the other, completing the circuit.
-
-To find all such crossings efficiently I use a sweep line over columns, which avoids the
-O(H*V) brute-force comparison of every segment pair.
+**Finding valid insertions**: a mirror placed at cell `(r, c)` works if a forward segment passes through it horizontally and a backward segment passes through it vertically (or vice versa). Finding all such crossings uses a sweep line over columns, avoiding the O(H·V) brute-force comparison.
 
 ## Complexity
 
-Let M = total number of mirrors (m + n), S = number of segments each trace produces (at most M+1).
+Let M = total mirrors, S = segments per trace (at most 2M+1, since each mirror can be hit from two sides), K = valid insertion cells found.
 
-- Building the mirror map: O(M log M)
-- Tracing the beam (forward + backward): O(M log M) — each step is one BTreeMap range query
-- Sweep line intersection: O(S log S + K) where K = number of valid insertion cells found
-- Overall: O(M log M + K)
+| Phase | Time |
+|---|---|
+| Build mirror map | O(M log M) |
+| Trace forward + backward | O(M log M) |
+| Sweep line intersection | O(S log S + K log K) |
+| **Overall** | **O(M log M + K log M)** |
 
-Memory: O(M) for the mirror maps, O(S) for segments — no grid allocation.
+Memory: O(M + K) — no grid allocation.
